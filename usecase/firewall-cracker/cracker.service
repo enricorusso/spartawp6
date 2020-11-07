@@ -1,0 +1,12 @@
+[Unit]
+Description=cracker docker
+After=network.target
+#After=nethserver-system-init
+
+[Service]
+Type=oneshot
+Environment="ROLES=$ROLES DEFGW=$DEFGW ROOTPW=$ROOTPW"
+ExecStart=/usr/local/bin/cracker.sh
+
+[Install]
+WantedBy=default.target

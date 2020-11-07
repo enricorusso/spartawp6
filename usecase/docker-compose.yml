@@ -1,0 +1,270 @@
+version: "2.3"
+
+services:
+   vpn:
+    build: ./vpn-cracker
+    image: spartawp6/vpn
+    hostname: vpn.sparta.ii
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - "8886:8886/tcp"
+      - "8887:8887/tcp"
+      - "8888:8888/tcp"
+      - "8889:8889/tcp"
+    hostname: vpn-server
+    networks:
+         ext:
+            ipv4_address: 172.16.255.100
+         intranet:
+            ipv4_address: 192.168.100.100
+         iot:
+            ipv4_address: 192.168.200.100
+         dmz:
+            ipv4_address: 198.51.100.100
+         simint:
+            ipv4_address: 27.8.0.100
+
+   rt-simint:
+      build: ./ubuntu-cracker
+      image: spartawp6/ubuntu
+      hostname: simint.sparta.ii
+      cap_add:
+         - NET_ADMIN
+         - NET_RAW
+      environment:
+         - MASQUERADE=172.16.255.0
+         - ROUTES=198.51.100.0/24 via 10.255.255.1;blackhole 192.168.0.0/16
+         - ROOTPW=test123
+      networks:
+         outside:
+            ipv4_address: 10.255.255.2
+         simint:
+            ipv4_address: 27.8.255.254   
+         ext:
+
+   extclient:
+      build: ./ubuntu-cracker
+      image: spartawp6/ubuntu
+      hostname: extclient
+      environment:
+         - DNS=198.51.100.2
+         - DEFGW=27.8.255.254
+         - ROOTPW=test123
+      cap_add:
+         - NET_ADMIN
+         - NET_RAW
+      networks:
+         simint:
+
+   fw:
+      #  echo 1 > /proc/sys/net/netfilter/nf_log_all_netns (for iptables logging)
+      #  TODO: moving firewall logging to ULOG
+      build: ./firewall-cracker
+      image: spartawp6/firewall
+      hostname: fw.sparta.ii
+      cap_add:
+         - NET_ADMIN
+         - NET_RAW
+      security_opt:
+         - seccomp:unconfined
+      tmpfs:
+         - /tmp 
+         - /run 
+         - /run/lock
+      volumes:
+         - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      #NO dns:
+      #   - 8.8.8.8
+      #   - 8.8.4.4
+      #extra_hosts:
+      #   - "mytest:192.168.200.200"
+      environment:
+         - ROLES=10.255.255.1,red 192.168.200.1,green 192.168.100.1,green 198.51.100.1,orange
+         - DEFGW=10.255.255.2
+         - ROOTPW=test123
+      networks:
+         intranet:
+            ipv4_address: 192.168.100.1
+         dmz:
+            ipv4_address: 198.51.100.1
+         iot:
+            ipv4_address: 192.168.200.1
+            ipv6_address: 2001:db8:0:200::1
+         outside:
+            ipv4_address: 10.255.255.1
+
+   # intranet
+
+   acs:
+      build: ./ubuntu-cracker
+      image: spartawp6/ubuntu
+      hostname: acs.sparta.ii
+      cap_add:
+         - NET_ADMIN
+         - NET_RAW
+      environment:
+         - DNS=198.51.100.2
+         - DEFGW=192.168.100.1
+         - ROOTPW=test123
+      networks:
+         intranet:
+            ipv4_address: 192.168.100.2
+
+   abc:
+      build: ./ubuntu-cracker
+      image: spartawp6/ubuntu
+      hostname: abc.sparta.ii
+      cap_add:
+         - NET_ADMIN
+         - NET_RAW
+      environment:
+         - DNS=198.51.100.2
+         - DEFGW=192.168.100.1
+         - ROOTPW=test123
+      networks:
+         intranet:
+            ipv4_address: 192.168.100.3
+
+   ids:
+      build: ./ubuntu-cracker
+      image: spartawp6/ubuntu
+      hostname: ids.sparta.ii
+      cap_add:
+         - NET_ADMIN
+         - NET_RAW
+      environment:
+         - DNS=198.51.100.2
+         - DEFGW=192.168.100.1
+         - ROOTPW=test123
+      networks:
+         intranet:
+            ipv4_address: 192.168.100.4
+
+   aqm:
+      build: ./ubuntu-cracker
+      image: spartawp6/ubuntu
+      hostname: aqm.sparta.ii
+      cap_add:
+         - NET_ADMIN
+         - NET_RAW
+      environment:
+         - DNS=198.51.100.2
+         - DEFGW=192.168.100.1
+         - ROOTPW=test123
+      networks:
+         intranet:
+            ipv4_address: 192.168.100.5
+
+      # iot
+
+   fog:
+      build: ./ubuntu-cracker
+      image: spartawp6/ubuntu
+      hostname: fog.sparta.ii
+      cap_add:
+         - NET_ADMIN
+         - NET_RAW
+      environment:
+         - DNS=198.51.100.2
+         - DEFGW=192.168.100.1
+         - ROOTPW=test123
+      networks:
+         iot:
+            ipv4_address: 192.168.200.2
+
+   # dmz
+
+   dns:
+      build: ./dns-cracker
+      image: spartawp6/ubuntudns
+      hostname: dns.sparta.ii
+      cap_add:
+         - NET_ADMIN
+         - NET_RAW
+      environment:
+         - DNS=127.0.0.1
+         - DEFGW=198.51.100.1
+         - ROOTPW=test123
+      networks:
+         dmz:
+            ipv4_address: 198.51.100.2
+
+   www:
+      build: ./www-cracker
+      image: spartawp6/ubuntuwww
+      hostname: www.sparta.ii
+      cap_add:
+         - NET_ADMIN
+         - NET_RAW
+      environment:
+         - DNS=198.51.100.2
+         - DEFGW=198.51.100.1
+         - ROOTPW=test123
+      networks:
+         dmz:
+            ipv4_address: 198.51.100.3
+
+   proxy:
+      build: ./ubuntu-cracker
+      image: spartawp6/ubuntu
+      hostname: proxy.sparta.ii
+      cap_add:
+         - NET_ADMIN
+         - NET_RAW
+      environment:
+         - DNS=198.51.100.2
+         - DEFGW=198.51.100.1
+         - ROOTPW=test123
+      networks:
+         dmz:
+            ipv4_address: 198.51.100.4
+
+networks:
+    dmz:
+      internal: true
+      ipam:
+         driver: default
+         config:
+               - subnet: 198.51.100.0/24
+                 gateway: 198.51.100.253
+    intranet:
+      internal: true
+      ipam:
+         driver: default
+         config:
+               - subnet: 192.168.100.0/24
+                 gateway: 192.168.100.253
+
+    iot:
+      internal: true
+      ipam:
+         driver: default
+         config:
+               - subnet: 192.168.200.0/24
+                 gateway: 192.168.200.253
+               - subnet: "2001:db8:0:200::/64"
+                 gateway: "2001:db8:0:200::253"
+
+    outside:
+      internal: true
+      ipam:
+         driver: default
+         config:
+               - subnet: 10.255.255.0/24
+                 gateway: 10.255.255.253
+
+    simint:
+      internal: true
+      ipam:
+         driver: default
+         config:
+               - subnet: 27.8.0.0/16
+                 gateway: 27.8.8.8
+
+    ext:
+      # docker network create --driver=bridge --subnet=172.16.255.0/24 ext
+      external: true

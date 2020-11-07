@@ -1,0 +1,4 @@
+zone "sparta.ii" {
+             type master;
+             file "/etc/bind/db.sparta.ii";
+};

@@ -1,0 +1,11 @@
+# DO NOT MODIFY THIS FILE.
+# This file is automatically maintained by NethServer
+# configuration software.  Manually editing this file may put your 
+# system in an unknown state.
+#
+# updated: Sat Oct  3 19:38:33 2020
+eth0=ethernet|bootproto|none|gateway|10.255.255.2|ipaddr|10.255.255.1|netmask|255.255.255.0|nslabel||role|red
+eth1=ethernet|bootproto|none|gateway||ipaddr|198.51.100.1|netmask|255.255.255.0|nslabel||role|orange
+eth2=ethernet|bootproto|none|gateway||ipaddr|192.168.200.1|netmask|255.255.255.0|nslabel||role|green
+eth3=ethernet|bootproto|none|gateway||ipaddr|192.168.100.1|netmask|255.255.255.0|nslabel||role|green
+ppp0=xdsl-disabled|AuthType|auto|FwInBandwidth||FwOutBandwidth||Password||name|PPPoE|provider|xDSL provider|role|red|user|
