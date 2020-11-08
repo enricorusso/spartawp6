@@ -8,6 +8,7 @@ COPY vpn.html /var/www/html
 COPY logo.png /var/www/html
 COPY config/client.ovpn /var/www/html/
 COPY config/key.txt /var/www/html
+COPY config/bridge.sh /var/www/html
 
 EXPOSE 22
 ENTRYPOINT /usr/local/bin/cracker-www-entrypoint.sh
