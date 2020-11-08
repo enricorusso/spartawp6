@@ -9,6 +9,8 @@ build:	prepare
 
 # start scenario
 start:	
+	sudo test -d /sparta || sudo mkdir /sparta
+	sudo test -d /sparta/ids || sudo mkdir /sparta/ids
 	docker-compose up -d
 
 # stop scenario
@@ -46,6 +48,9 @@ www:
 
 fw:
 	docker exec -it usecase_fw_1 bash
+
+vpn:
+	docker exec -it usecase_vpn_1 bash
 
 rt-simint:
 	docker exec -it usecase_rt-simint_1 bash

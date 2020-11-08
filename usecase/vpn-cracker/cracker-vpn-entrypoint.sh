@@ -57,6 +57,7 @@ newbridge () {
   brctl addif br$2 $d_int
   brctl addif br$2 tap$2
 
+  ifconfig $d_int 0.0.0.0 promisc up
   ifconfig tap$2 0.0.0.0 promisc up
   ifconfig br$2 $1 netmask 255.255.255.0
 }

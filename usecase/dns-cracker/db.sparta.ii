@@ -1,6 +1,6 @@
 $TTL    3600
 @       IN      SOA     ns.sparta.ii. root.sparta.ii. (
-                              1         ; Serial
+                              2         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
@@ -20,3 +20,5 @@ ids     IN      A       192.168.100.4
 aqm     IN      A       192.168.100.5
 
 fog     IN      A       192.168.200.2
+
+vpn	IN	A 	27.8.0.100
